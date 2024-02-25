@@ -21,6 +21,7 @@ const std::vector<std::vector<int>> mBackGroundColor = { {255, 250, 250} //0
 														,{72, 61, 139}   //9
 														,{139, 0, 100} };//10 (r,g,b)
 
+
 Game::Game()
 :mWindow(nullptr)
 ,mRenderer(nullptr)
@@ -269,4 +270,16 @@ void Game::RemoveAsteroid(Asteroid* ast) {
 
 void Game::SetPlayerAsteroid(class Player_Asteroid* ast) {
 	mPAsteroid = ast;
+}
+
+void Game::GameBegin() {
+
+}
+
+void Game::GamePlaying() {
+
+}
+
+void Game::GameEnd() {
+
 }
