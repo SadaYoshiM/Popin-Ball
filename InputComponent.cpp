@@ -11,17 +11,21 @@ InputComponent::InputComponent(class Actor* owner)
 }
 
 void InputComponent::ProcessInput(const uint8_t* keyState) {
-	float moveSpeed = 0.0f;
+	float moveSpeedH = 0.0f;
 	if (keyState[mMoveRightKey]) {
-		moveSpeed += mMaxMoveSpeed;
+		moveSpeedH += mMaxMoveSpeed;
 	}
 	if (keyState[mMoveLeftKey]) {
-		moveSpeed -= mMaxMoveSpeed;
+		moveSpeedH -= mMaxMoveSpeed;
 	}
-	SetMoveSpeed(moveSpeed);
+	SetHorizontalMoveSpeed(moveSpeedH);
 
-	float jumpSpeed = 0.0f;
-	if (keyState[mJumpKey]) {
-		jumpSpeed -= mMaxJumpSpeed;
+	float moveSpeedV = 0.0f;
+	if (keyState[mMoveUpperKey]) {
+		moveSpeedV -= mMaxMoveSpeed;
 	}
+	if (keyState[mMoveDownKey]) {
+		moveSpeedV += mMaxMoveSpeed;
+	}
+	SetVerticalMoveSpeed(moveSpeedV);
 }

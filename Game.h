@@ -22,6 +22,8 @@ public :
 	void AddAsteroid(class Asteroid* ast);
 	void RemoveAsteroid(class Asteroid* ast);
 	std::vector<class Asteroid*>& GetAsteroids() { return mAsteroids; }
+	void SetPlayerAsteroid(class Player_Asteroid* ast);
+	Player_Asteroid& GetPlayerAsteroid() { return *mPAsteroid; }
 
 private:
 	void ProcessInput();
@@ -42,6 +44,7 @@ private:
 	std::vector<class Actor*> mPendingActors;
 	std::vector<class SpriteComponent*> mSprites;
 	class Ship* mShip;
+	class Player_Asteroid* mPAsteroid;
 	std::vector<class Asteroid*> mAsteroids;
 	float mGenerateFlex;
 	int mBrokeCount;

@@ -1,10 +1,9 @@
 #pragma once
 #include "Actor.h"
 
-class Asteroid :public Actor {
+class Player_Asteroid :public Actor {
 public:
-	Asteroid(class Game* game, bool playable);
-	~Asteroid();
+	Player_Asteroid(class Game* game);
 
 	class CircleComponent* GetCircle() { return mCircle; }
 

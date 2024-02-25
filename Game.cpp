@@ -128,7 +128,7 @@ void Game::UpdateGame() {
 		mLevelUpCount += mLevelUpCount * 1.1f;
 	}
 	if (mTimer >= mGenerateFlex) {
-		new Asteroid(this);
+		new Asteroid(this, false);
 		mTimer = 0.0f;
 	}
 
@@ -142,9 +142,16 @@ void Game::UpdateGame() {
 	}
 	mPendingActors.clear();
 
+	if (mShip->GetState() == Actor::EDead) {
+		mIsRunning = false;
+	}
+
 	std::vector<Actor*> deadActors;
 	for (auto actor : mActors) {
 		if (actor->GetState() == Actor::EDead) {
+			if (actor->GetPlayable()) {
+				mIsRunning = false;
+			}
 			deadActors.emplace_back(actor);
 			mBrokeCount++;
 		}
@@ -153,6 +160,7 @@ void Game::UpdateGame() {
 	for (auto actor : deadActors) {
 		delete actor;
 	}
+
 }
 
 void Game::GenerateOutput() {
@@ -194,9 +202,7 @@ void Game::LoadData() {
 	mShip->SetRotation(Math::PiOver2);
 	mShip->SetScale(Math::PiOver2/2);
 
-	for (int i = 0; i < 10; i++) {
-		new Asteroid(this);
-	}
+	new Asteroid(this, true);
 }
 
 void Game::UnloadData() {
@@ -259,4 +265,8 @@ void Game::RemoveAsteroid(Asteroid* ast) {
 	if (iter != mAsteroids.end()) {
 		mAsteroids.erase(iter);
 	}
+}
+
+void Game::SetPlayerAsteroid(class Player_Asteroid* ast) {
+	mPAsteroid = ast;
 }

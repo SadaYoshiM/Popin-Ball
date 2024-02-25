@@ -30,6 +30,8 @@ public:
 	void SetScale(float scale) { mScale = scale; }
 	float GetRotation() const { return mRotation; }
 	void SetRotation(float rotation) { mRotation = rotation; }
+	bool GetPlayable() const { return mIsPlayable; }
+	void SetPlayable(bool playable) { mIsPlayable = playable; }
 
 	Vector2 GetForward() const { return Vector2(Math::Cos(mRotation), -Math::Sin(mRotation)); }
 
@@ -46,6 +48,7 @@ private:
 	Vector2 mVelocity;
 	float mScale;
 	float mRotation;
+	bool mIsPlayable;
 	std::vector<class Component*> mComponents;
 	class Game* mGame;
 };

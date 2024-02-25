@@ -1,20 +1,18 @@
 #include "MoveComponent.h"
 #include "Actor.h"
+#include "SDL/SDL.h"
 
 MoveComponent::MoveComponent(class Actor* owner, int updateOrder)
 	:Component(owner)
-	,mMoveSpeed(0.0f)
+	,mMoveSpeedH(0.0f)
+	,mMoveSpeedV(0.0f)
 	,mIsReflect(false)
+	,mIsPlayable(false)
 {
 
 }
 
 void MoveComponent::Update(float deltaTime) {
-	if (!Math::NearZero(mAngularSpeed)) {
-		float rot = mOwner->GetRotation();
-		rot += mAngularSpeed * deltaTime;
-		mOwner->SetRotation(rot);
-	}
 	if (!Math::NearZero(mForwardSpeed)) {
 		Vector2 pos = mOwner->GetPosition();
 		Vector2 vel = mOwner->GetVelocity();
@@ -44,7 +42,7 @@ void MoveComponent::Update(float deltaTime) {
 		mOwner->SetVelocity(vel);
 		mOwner->SetPosition(pos);
 	}
-	if (!Math::NearZero(mMoveSpeed)) {
+	if (!Math::NearZero(mMoveSpeedH) || !Math::NearZero(mMoveSpeedV)) {
 		Vector2 pos = mOwner->GetPosition();
 		Vector2 dir = mOwner->GetForward();
 		float tmp = dir.x;
@@ -61,7 +59,7 @@ void MoveComponent::Update(float deltaTime) {
 			pos.y = 768.0f - 30.0f;
 		}
 
-		pos += dir * mMoveSpeed * deltaTime;
+		pos += dir * Vector2(mMoveSpeedH, mMoveSpeedV) * deltaTime;
 		mOwner->SetPosition(pos);
 	}
 }
