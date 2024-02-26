@@ -25,7 +25,7 @@ Asteroid::Asteroid(Game* game, bool playable)
 	}
 
 	MoveComponent* mc = new MoveComponent(this);
-	mc->SetForwardSpeed(150.0f);
+	mc->SetForwardSpeed(120.0f);
 	mc->SetHorizontalMoveSpeed(0.0f);
 	mc->SetVerticalMoveSpeed(0.0f);
 	mc->SetReflect(true);
@@ -36,9 +36,9 @@ Asteroid::Asteroid(Game* game, bool playable)
 		ic->SetMoveLeftKey(SDL_SCANCODE_J);
 		ic->SetMoveUpperKey(SDL_SCANCODE_I);
 		ic->SetMoveDownKey(SDL_SCANCODE_K);
-		ic->SetHorizontalMoveSpeed(120.0f);
-		ic->SetVerticalMoveSpeed(120.0f);
-		ic->SetMaxMoveSpeed(120.0f);
+		ic->SetHorizontalMoveSpeed(1.5f);
+		ic->SetVerticalMoveSpeed(1.2f);
+		ic->SetMaxMoveSpeed(200.0f);
 	}
 	
 	mCircle = new CircleComponent(this);

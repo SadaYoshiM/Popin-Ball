@@ -8,7 +8,7 @@
 
 Ship::Ship(Game* game)
 	:Actor(game)
-	,mLaserCooldown(0.0f)
+	,mLaserCooldown(0.1f)
 {
 	SpriteComponent* sc = new SpriteComponent(this, 150);
 	sc->SetTexture(game->GetTexture("Assets/Ship.png"));

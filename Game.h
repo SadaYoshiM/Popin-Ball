@@ -9,7 +9,8 @@ public :
 	enum GameState {
 		State_Start,
 		State_Playing,
-		State_End
+		State_Clear,
+		State_Over
 	};
 	Game();
 	bool Initialize();
@@ -27,15 +28,16 @@ public :
 	void AddAsteroid(class Asteroid* ast);
 	void RemoveAsteroid(class Asteroid* ast);
 	std::vector<class Asteroid*>& GetAsteroids() { return mAsteroids; }
-	void SetPlayerAsteroid(class Player_Asteroid* ast);
-	Player_Asteroid& GetPlayerAsteroid() { return *mPAsteroid; }
 
 	int GetGameState() const { return mState; }
 	void SetGameState(int state) { mState = state; }
 
+	void SetLevelUpCount();
+
 	void GameBegin();
-	void GamePlaying();
-	void GameEnd();
+	void GamePlaying(float deltaTime);
+	void GameClear(float deltaTime);
+	void GameOver(float deltaTime);
 
 private:
 	void ProcessInput();
@@ -56,10 +58,10 @@ private:
 	std::vector<class Actor*> mPendingActors;
 	std::vector<class SpriteComponent*> mSprites;
 	class Ship* mShip;
-	class Player_Asteroid* mPAsteroid;
 	std::vector<class Asteroid*> mAsteroids;
 	float mGenerateFlex;
 	int mBrokeCount;
 	int mLevelUpCount;
 	int mState;
+	float mGameoverCoolTime;
 };
