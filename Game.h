@@ -6,6 +6,12 @@
 
 class Game{
 public :
+	enum GameState {
+		State_Start,
+		State_Playing,
+		State_Clear,
+		State_Over
+	};
 	Game();
 	bool Initialize();
 	void RunLoop();
@@ -22,6 +28,16 @@ public :
 	void AddAsteroid(class Asteroid* ast);
 	void RemoveAsteroid(class Asteroid* ast);
 	std::vector<class Asteroid*>& GetAsteroids() { return mAsteroids; }
+
+	int GetGameState() const { return mState; }
+	void SetGameState(int state) { mState = state; }
+
+	void SetLevelUpCount();
+
+	void GameBegin();
+	void GamePlaying(float deltaTime);
+	void GameClear(float deltaTime);
+	void GameOver(float deltaTime);
 
 private:
 	void ProcessInput();
@@ -46,4 +62,6 @@ private:
 	float mGenerateFlex;
 	int mBrokeCount;
 	int mLevelUpCount;
+	int mState;
+	float mGameoverCoolTime;
 };

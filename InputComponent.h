@@ -11,14 +11,22 @@ public:
 	float GetMaxMove() const { return mMaxMoveSpeed; }
 	int GetMoveRightKey() const { return mMoveRightKey; }
 	int GetMoveLeftKey() const { return mMoveLeftKey; }
+	int GetMoveUpperKey() const { return mMoveUpperKey; }
+	int GetMoveDownKey() const { return mMoveDownKey; }
+	int GetJumpKey() const { return mJumpKey; }
 
 	void SetMaxMoveSpeed(float speed) { mMaxMoveSpeed = speed; }
 	void SetMoveRightKey(int key) { mMoveRightKey = key; }
 	void SetMoveLeftKey(int key) { mMoveLeftKey = key; }
+	void SetMoveUpperKey(int key) { mMoveUpperKey = key; }
+	void SetMoveDownKey(int key) { mMoveDownKey = key; }
 
 private:
 	float mMaxMoveSpeed;
 
 	int mMoveRightKey;
 	int mMoveLeftKey;
+	int mMoveUpperKey;
+	int mMoveDownKey;
+	int mJumpKey;
 };

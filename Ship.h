@@ -9,4 +9,5 @@ public:
 
 private:
 	float mLaserCooldown;
+	class CircleComponent* mCircle;
 };

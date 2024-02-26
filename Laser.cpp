@@ -30,7 +30,9 @@ void Laser::UpdateActor(float deltaTime) {
 		for (auto ast : GetGame()->GetAsteroids()) {
 			if (Intersect(*mCircle, *(ast->GetCircle()))) {
 				SetState(EDead);
-				ast->SetState(EDead);
+				if (!ast->GetPlayable()) {
+					ast->SetState(EDead);
+				}
 				break;
 			}
 		}

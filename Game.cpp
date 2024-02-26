@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "SDL/SDL_image.h"
+#include "SDL/SDL_ttf.h"
 #include <algorithm>
 #include "Actor.h"
 #include "Ship.h"
@@ -7,6 +8,24 @@
 #include "BGSpriteComponent.h"
 #include "Random.h"
 #include "Asteroid.h"
+#include <iostream>
+
+int mLevel = 0;
+const float mGameOverTime = 2.0f;
+const std::vector<std::vector<int>> mBackGroundColor = { {255, 250, 250} //0
+														,{245, 255, 240} //1
+														,{224, 255, 255} //2
+														,{200, 240, 185} //3
+														,{220, 230, 150} //4
+														,{255, 218, 185} //5
+														,{255, 192, 200} //6
+														,{240, 128, 128} //7
+														,{150, 100, 220} //8
+														,{72, 61, 139}   //9
+														,{139, 0, 100}	//10 (r,g,b)
+														,{255, 215, 0}	//game clear
+														,{250, 20, 40} };	//game over
+
 
 Game::Game()
 :mWindow(nullptr)
@@ -15,13 +34,13 @@ Game::Game()
 ,mIsRunning(true)
 ,mUpdatingActors(false)
 ,mTimer(0.0f)
-,mGenerateFlex(1.5f)
+,mGenerateFlex(1.0f)
 ,mBrokeCount(0)
-,mLevelUpCount(10)
+,mLevelUpCount(5)
+,mGameoverCoolTime(0.0f)
 {
 
 }
-
 
 bool Game::Initialize() {
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0) {
@@ -46,10 +65,14 @@ bool Game::Initialize() {
 		return false;
 	}
 
-	LoadData();
-
 	mTicksCount = SDL_GetTicks();
 	mTimer = 0.0f;
+	mLevel = 0;
+	mGenerateFlex = 1.0f;
+	mBrokeCount = 0;
+	mLevelUpCount = 5;
+	mGameoverCoolTime = 0.0f;
+	mState = State_Start;
 
 	return true;
 }
@@ -95,52 +118,36 @@ void Game::UpdateGame() {
 	while (!SDL_TICKS_PASSED(SDL_GetTicks(), mTicksCount + 16)) {
 		;
 	}
-
 	float deltaTime = (SDL_GetTicks() - mTicksCount) / 1000.0f;
 	if (deltaTime > 0.05f) {
 		deltaTime = 0.05f;
 	}
 	mTimer += deltaTime;
 	mTicksCount = SDL_GetTicks();
-
-	if (mBrokeCount >= mLevelUpCount) {
-		mGenerateFlex -= 0.05f;
-		if (mGenerateFlex < 0.02f) {
-			mGenerateFlex = 0.02f;
+	switch (mState) {
+	case State_Start:
+		GameBegin();
+		break;
+	case State_Playing:
+		GamePlaying(deltaTime);
+		if (mBrokeCount >= 65) {
+			mState = State_Clear;
 		}
-		mBrokeCount = 0;
-		mLevelUpCount *= 1.1f;
-	}
-	if (mTimer >= mGenerateFlex) {
-		new Asteroid(this);
-		mTimer = 0.0f;
-	}
-
-	mUpdatingActors = true;
-	for (auto actor : mActors) {
-		actor->Update(deltaTime);
-	}
-	mUpdatingActors = false;
-	for (auto pending : mPendingActors) {
-		mActors.emplace_back(pending);
-	}
-	mPendingActors.clear();
-
-	std::vector<Actor*> deadActors;
-	for (auto actor : mActors) {
-		if (actor->GetState() == Actor::EDead) {
-			deadActors.emplace_back(actor);
-		}
-	}
-
-	for (auto actor : deadActors) {
-		delete actor;
-		mBrokeCount++;
+		break;
+	case State_Clear:
+		GameClear(deltaTime);
+		break;
+	case State_Over:
+		GameOver(deltaTime);
+		break;
+	default:
+		mState = State_Start;
+		break;
 	}
 }
 
 void Game::GenerateOutput() {
-	SDL_SetRenderDrawColor(mRenderer, 46, 139, 87, 255);
+	SDL_SetRenderDrawColor(mRenderer, mBackGroundColor[mLevel][0], mBackGroundColor[mLevel][1], mBackGroundColor[mLevel][2], 255);
 	SDL_RenderClear(mRenderer);
 	for (auto sprite : mSprites) {
 		sprite->Draw(mRenderer);
@@ -177,11 +184,8 @@ void Game::LoadData() {
 	mShip->SetPosition(Vector2(512.0f, 768.0f-30.0f));
 	mShip->SetRotation(Math::PiOver2);
 	mShip->SetScale(Math::PiOver2/2);
-	/*
-	const int numAsterois = 20;
-	for (int i = 0; i < numAsterois; i++) {
-		new Asteroid(this);
-	}*/
+
+	new Asteroid(this, true);
 }
 
 void Game::UnloadData() {
@@ -243,5 +247,97 @@ void Game::RemoveAsteroid(Asteroid* ast) {
 	auto iter = std::find(mAsteroids.begin(), mAsteroids.end(), ast);
 	if (iter != mAsteroids.end()) {
 		mAsteroids.erase(iter);
+		mBrokeCount++;
+	}
+}
+
+void Game::GameBegin() {
+	mTimer = 0.0f;
+	mLevel = 0;
+	mGameoverCoolTime = 0.0f;
+	mGenerateFlex = 1.0f;
+	mBrokeCount = 0;
+	mLevelUpCount = 5;
+	const Uint8* keyState = SDL_GetKeyboardState(NULL);
+	if (keyState[SDL_SCANCODE_SPACE]) {
+		LoadData();
+		mState = State_Playing;
+	}
+}
+
+void Game::GamePlaying(float deltaTime) {
+	if (mBrokeCount >= mLevelUpCount) {
+		mGenerateFlex -= 0.08f;
+		if (mGenerateFlex < 0.2f) {
+			mGenerateFlex = 0.2f;
+		}
+		mLevel++;
+		if (mLevel >= 10) {
+			mLevel = 10;
+		}
+		SetLevelUpCount();
+	}
+	if (mTimer >= mGenerateFlex) {
+		new Asteroid(this, false);
+		mTimer = 0.0f;
+	}
+
+	mUpdatingActors = true;
+	for (auto actor : mActors) {
+		actor->Update(deltaTime);
+	}
+	mUpdatingActors = false;
+	for (auto pending : mPendingActors) {
+		mActors.emplace_back(pending);
+	}
+	mPendingActors.clear();
+
+	if (mShip->GetState() == Actor::EDead) {
+		mState = State_Over;
+	}
+
+	std::vector<Actor*> deadActors;
+	for (auto actor : mActors) {
+		if (actor->GetState() == Actor::EDead) {
+			if (actor->GetPlayable()) {
+				mState = State_Over;
+			}
+			deadActors.emplace_back(actor);
+		}
+	}	
+
+	for (auto actor : deadActors) {
+		delete actor;
+	}
+}
+
+void Game::GameClear(float deltaTime) {
+	mLevel = 11;
+	mGameoverCoolTime += deltaTime;
+	if (mGameoverCoolTime >= mGameOverTime) {
+		UnloadData();
+		mState = State_Start;
+	}
+}
+
+void Game::GameOver(float deltaTime) {
+	mLevel = 12;
+	mGameoverCoolTime += deltaTime;
+	if (mGameoverCoolTime >= mGameOverTime) {
+		UnloadData();
+		mState = State_Start;
+	}
+}
+
+void Game::SetLevelUpCount() {
+	if (mLevel == 0) {
+		mLevelUpCount = 5;
+	}
+	else if (mLevel == 1) {
+		mLevelUpCount = 10;
+	}
+	else if(mLevel <= 10){
+		//mLevelUpCount = int(1.5f * mLevelUpCount + mLevel);
+		mLevelUpCount += 5;
 	}
 }
