@@ -5,7 +5,6 @@
 #include "Actor.h"
 #include "Ship.h"
 #include "SpriteComponent.h"
-#include "BGSpriteComponent.h"
 #include "Random.h"
 #include "Asteroid.h"
 #include <iostream>
